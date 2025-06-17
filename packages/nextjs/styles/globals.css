@@ -119,3 +119,28 @@
 .link:hover {
   opacity: 80%;
 }
+
+
+/* Для плавного перехода размытия */
+.blur-sm {
+  transition: filter 0.2s ease;
+}
+
+/* Для браузеров, которые не поддерживают backdrop-filter */
+@supports not (backdrop-filter: blur(4px)) {
+  .backdrop-blur-sm {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* Гарантированно поверх всех элементов */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 10000;
+}
