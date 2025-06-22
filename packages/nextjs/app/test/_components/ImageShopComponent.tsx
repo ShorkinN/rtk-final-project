@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 
+// import { ethers } from 'ethers';
+
+// const ABI = [
+//     "function safeMint(address to) public returns (uint256)"
+// ];
+
 interface ImageCard {
   id: number;
   title: string;
@@ -44,6 +50,9 @@ const ImageShopComponent = () => {
     imageUrl: "",
   });
 
+  // const [signer, setSigner] = useState(null);
+  // const [provider, setProvider] = useState(null);
+
   // Эффект для блокировки скролла при открытой модалке
   useEffect(() => {
     if (showAddressModal || showAddImageModal) {
@@ -56,6 +65,22 @@ const ImageShopComponent = () => {
       document.body.style.overflow = "auto";
     };
   }, [showAddressModal, showAddImageModal]);
+
+  // useEffect(() => {
+  //   async function init() {
+  //       let _provider, _signer;
+  //       if (window.ethereum == null) {
+  //           console.log("MetaMask not installed; using read -only defaults")
+  //           _provider = ethers.getDefaultProvider();
+  //       } else {
+  //           _provider = new ethers.BrowserProvider(window.ethereum);
+  //           _signer = await _provider.getSigner();
+  //       }
+  //       setProvider(_provider);
+  //       setSigner(_signer);
+  //   }
+  //   init();
+  // }, []);
 
   const handleBuyClick = (imageId: number) => {
     setCurrentImageId(imageId);
@@ -87,7 +112,7 @@ const ImageShopComponent = () => {
     setNewImage(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAddImageSubmit = () => {
+  const handleAddImageSubmit = async () => {
     if (!newImage.title.trim() || !newImage.price.trim() || !newImage.imageUrl.trim()) {
       alert("Пожалуйста, заполните все поля");
       return;
@@ -110,6 +135,10 @@ const ImageShopComponent = () => {
     setNewImage({ title: "", price: "", imageUrl: "" });
     setShowAddImageModal(false);
 
+    // const contractAddress = "";
+    // const contract = new ethers.Contract(contractAddress, ABI, signer);
+    // const tx = await contract.safeMint(signer.getAddress());
+    // await tx.wait();
     alert("Картинка успешно добавлена на продажу!");
   };
 
