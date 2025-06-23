@@ -20,7 +20,7 @@ contract YourContract is ERC721URIStorage {
         address payable seller;
         address payable owner;
         uint256 price;
-        bool sold;
+        bool isListed;
     }
 
     event MarketItemCreated(
@@ -28,7 +28,7 @@ contract YourContract is ERC721URIStorage {
         address seller,
         address owner,
         uint256 price,
-        bool sold
+        bool isListed
     );
 
     modifier onlyOwner {
@@ -40,7 +40,7 @@ contract YourContract is ERC721URIStorage {
         owner = payable(_owner);
     }
 
-    function setListingPrice(uint256 _listingPrice) public payable onlyOwner {
+    function setListingPrice(uint256 _listingPrice) public onlyOwner {
         listingPrice = _listingPrice;
     }
 
@@ -65,23 +65,24 @@ contract YourContract is ERC721URIStorage {
     }
 
     function createMarketItem(uint256 tokenId, uint256 price) private {
-        require(price > 0, "Price cannot be less than 0!");
+        require(price > 0, "Price cannot be less than 0");
 
-        _idToMarketItem[tokenId] = MarketItem(tokenId, payable(msg.sender), payable(address(this)), price, false);
+        _idToMarketItem[tokenId] = MarketItem(tokenId, payable(msg.sender), payable(address(this)), price, true);
 
         _transfer(msg.sender, address(this), tokenId);
-
-        emit MarketItemCreated(tokenId, msg.sender, address(this), price, false);
+        MarketItem memory newMarketItem = _idToMarketItem[tokenId];
+        emit MarketItemCreated(newMarketItem.tokenId, newMarketItem.seller, newMarketItem.owner, newMarketItem.price, newMarketItem.isListed);
     }
 
     function resellToken(uint256 tokenId, uint256 price) public payable {
         require(_idToMarketItem[tokenId].owner == msg.sender, "Only the item owner can resell token");
+        require(_idToMarketItem[tokenId].isListed == false, "Token already listed");
         require(msg.value == listingPrice, "Value should be equal to listing price");
 
-        _idToMarketItem[tokenId].sold = false;
         _idToMarketItem[tokenId].price = price;
         _idToMarketItem[tokenId].seller = payable(msg.sender);
         _idToMarketItem[tokenId].owner = payable(address(this));
+        _idToMarketItem[tokenId].isListed = true;
 
         _itemsSold -= 1;
 
@@ -89,16 +90,15 @@ contract YourContract is ERC721URIStorage {
     }
 
     function buyToken(uint256 tokenId) public payable {
+        require(_idToMarketItem[tokenId].isListed == true, "Token must be listed");
         uint256 price = _idToMarketItem[tokenId].price;
-
         require(msg.value == price, "Value should be equal to token price");
 
         _idToMarketItem[tokenId].owner = payable(msg.sender);
-
-        _idToMarketItem[tokenId].sold = true;
+        _idToMarketItem[tokenId].isListed = false;
 
         _itemsSold += 1;
-        _transfer(address(this), msg.sender, tokenId);  
+        _transfer(address(this), msg.sender, tokenId);
         _idToMarketItem[tokenId].seller.transfer(msg.value);
     }
 

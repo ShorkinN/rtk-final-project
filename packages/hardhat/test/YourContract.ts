@@ -61,7 +61,7 @@ describe("YourContract", function () {
         }),
       )
         .to.emit(contract, "MarketItemCreated")
-        .withArgs(1, addr1.address, contractAddress, tokenPrice, false);
+        .withArgs(1, addr1.address, contractAddress, tokenPrice, true);
 
       const marketItems = await contract.getMarketItems();
       expect(marketItems.length).to.equal(1);
@@ -69,7 +69,7 @@ describe("YourContract", function () {
       expect(marketItems[0].seller).to.equal(addr1.address);
       expect(marketItems[0].owner).to.equal(contractAddress);
       expect(marketItems[0].price).to.equal(tokenPrice);
-      expect(marketItems[0].sold).to.equal(false);
+      expect(marketItems[0].isListed).to.equal(true);
     });
 
     it("Should fail if listing price is not paid", async function () {
@@ -83,7 +83,7 @@ describe("YourContract", function () {
         contract.connect(addr1).createToken(tokenURI, 0, {
           value: listingPrice,
         }),
-      ).to.be.revertedWith("Price cannot be less than 0!");
+      ).to.be.revertedWith("Price cannot be less than 0");
     });
   });
 
@@ -107,7 +107,7 @@ describe("YourContract", function () {
       const myNFTs = await contract.connect(addr2).getUserTokens();
       expect(myNFTs.length).to.equal(1);
       expect(myNFTs[0].owner).to.equal(addr2.address);
-      expect(myNFTs[0].sold).to.equal(true);
+      expect(myNFTs[0].isListed).to.equal(false);
 
       // Check if seller received the funds (minus gas costs)
       const finalBalance = await ethers.provider.getBalance(addr1);
@@ -147,7 +147,7 @@ describe("YourContract", function () {
       expect(marketItems[0].seller).to.equal(addr2.address);
       expect(marketItems[0].owner).to.equal(contractAddress);
       expect(marketItems[0].price).to.equal(newPrice);
-      expect(marketItems[0].sold).to.equal(false);
+      expect(marketItems[0].isListed).to.equal(true);
     });
 
     it("Should fail if non-owner tries to resell", async function () {
