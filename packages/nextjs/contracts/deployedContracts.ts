@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     YourContract: {
-      address: "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
       abi: [
         {
           inputs: [
@@ -196,6 +196,43 @@ const deployedContracts = {
           anonymous: false,
           inputs: [
             {
+              indexed: true,
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "address",
+              name: "seller",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "price",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "bool",
+              name: "sold",
+              type: "bool",
+            },
+          ],
+          name: "MarketItemCreated",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
               indexed: false,
               internalType: "uint256",
               name: "_tokenId",
@@ -228,43 +265,6 @@ const deployedContracts = {
             },
           ],
           name: "Transfer",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "uint256",
-              name: "tokenId",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "address",
-              name: "seller",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "priceInEther",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "bool",
-              name: "sold",
-              type: "bool",
-            },
-          ],
-          name: "idMarketItemCreated",
           type: "event",
         },
         {
@@ -312,7 +312,7 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "createMarketSale",
+          name: "buyToken",
           outputs: [],
           stateMutability: "payable",
           type: "function",
@@ -326,7 +326,7 @@ const deployedContracts = {
             },
             {
               internalType: "uint256",
-              name: "priceInEther",
+              name: "price",
               type: "uint256",
             },
           ],
@@ -339,126 +339,6 @@ const deployedContracts = {
             },
           ],
           stateMutability: "payable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "fetchItemListed",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "uint256",
-                  name: "tokenId",
-                  type: "uint256",
-                },
-                {
-                  internalType: "address payable",
-                  name: "seller",
-                  type: "address",
-                },
-                {
-                  internalType: "address payable",
-                  name: "owner",
-                  type: "address",
-                },
-                {
-                  internalType: "uint256",
-                  name: "priceInEther",
-                  type: "uint256",
-                },
-                {
-                  internalType: "bool",
-                  name: "sold",
-                  type: "bool",
-                },
-              ],
-              internalType: "struct YourContract.MarketItem[]",
-              name: "",
-              type: "tuple[]",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "fetchMarketItem",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "uint256",
-                  name: "tokenId",
-                  type: "uint256",
-                },
-                {
-                  internalType: "address payable",
-                  name: "seller",
-                  type: "address",
-                },
-                {
-                  internalType: "address payable",
-                  name: "owner",
-                  type: "address",
-                },
-                {
-                  internalType: "uint256",
-                  name: "priceInEther",
-                  type: "uint256",
-                },
-                {
-                  internalType: "bool",
-                  name: "sold",
-                  type: "bool",
-                },
-              ],
-              internalType: "struct YourContract.MarketItem[]",
-              name: "",
-              type: "tuple[]",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "fetchMyNFT",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "uint256",
-                  name: "tokenId",
-                  type: "uint256",
-                },
-                {
-                  internalType: "address payable",
-                  name: "seller",
-                  type: "address",
-                },
-                {
-                  internalType: "address payable",
-                  name: "owner",
-                  type: "address",
-                },
-                {
-                  internalType: "uint256",
-                  name: "priceInEther",
-                  type: "uint256",
-                },
-                {
-                  internalType: "bool",
-                  name: "sold",
-                  type: "bool",
-                },
-              ],
-              internalType: "struct YourContract.MarketItem[]",
-              name: "",
-              type: "tuple[]",
-            },
-          ],
-          stateMutability: "view",
           type: "function",
         },
         {
@@ -488,6 +368,126 @@ const deployedContracts = {
               internalType: "uint256",
               name: "",
               type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getMarketItems",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "tokenId",
+                  type: "uint256",
+                },
+                {
+                  internalType: "address payable",
+                  name: "seller",
+                  type: "address",
+                },
+                {
+                  internalType: "address payable",
+                  name: "owner",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "price",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "sold",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct YourContract.MarketItem[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getUserListedTokens",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "tokenId",
+                  type: "uint256",
+                },
+                {
+                  internalType: "address payable",
+                  name: "seller",
+                  type: "address",
+                },
+                {
+                  internalType: "address payable",
+                  name: "owner",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "price",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "sold",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct YourContract.MarketItem[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getUserTokens",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "tokenId",
+                  type: "uint256",
+                },
+                {
+                  internalType: "address payable",
+                  name: "seller",
+                  type: "address",
+                },
+                {
+                  internalType: "address payable",
+                  name: "owner",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "price",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "sold",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct YourContract.MarketItem[]",
+              name: "",
+              type: "tuple[]",
             },
           ],
           stateMutability: "view",
@@ -531,6 +531,19 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address payable",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
           inputs: [
             {
               internalType: "uint256",
@@ -558,11 +571,11 @@ const deployedContracts = {
             },
             {
               internalType: "uint256",
-              name: "priceInEther",
+              name: "price",
               type: "uint256",
             },
           ],
-          name: "reSellToken",
+          name: "resellToken",
           outputs: [],
           stateMutability: "payable",
           type: "function",
@@ -639,6 +652,19 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "uint256",
+              name: "_listingPrice",
+              type: "uint256",
+            },
+          ],
+          name: "setListingPrice",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
               internalType: "bytes4",
               name: "interfaceId",
               type: "bytes4",
@@ -708,19 +734,6 @@ const deployedContracts = {
           name: "transferFrom",
           outputs: [],
           stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_listingPrice",
-              type: "uint256",
-            },
-          ],
-          name: "updateListingPrice",
-          outputs: [],
-          stateMutability: "payable",
           type: "function",
         },
       ],
