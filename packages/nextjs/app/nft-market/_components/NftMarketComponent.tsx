@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AbstractProvider, JsonRpcSigner, ethers } from "ethers";
+
+const ABI = [
+  "function getMarketItems() public view returns (MarketItem[] memory)",
+  "function ownerOf(uint256 tokenId) view returns (address)",
+];
 
 interface NftCard {
   id: number;
@@ -30,15 +36,15 @@ const NftMarketComponent = () => {
     },
   ]);
 
-  const [currentNftId, setCurrentNftId] = useState<number | null>(null);
+  const [contractAddress, setContractAddress] = useState("");
   const [showAddNftModal, setShowAddNftModal] = useState(false);
   const [newNft, setNewNft] = useState({
     price: "",
     nftUri: "",
   });
 
-  // const [signer, setSigner] = useState(null);
-  // const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState<JsonRpcSigner | undefined>(undefined);
+  const [provider, setProvider] = useState<AbstractProvider | null>(null);
 
   useEffect(() => {
     if (showAddNftModal) {
@@ -52,28 +58,37 @@ const NftMarketComponent = () => {
     };
   }, [showAddNftModal]);
 
-  // useEffect(() => {
-  //   async function init() {
-  //       let _provider, _signer;
-  //       if (window.ethereum == null) {
-  //           console.log("MetaMask not installed; using read -only defaults")
-  //           _provider = ethers.getDefaultProvider();
-  //       } else {
-  //           _provider = new ethers.BrowserProvider(window.ethereum);
-  //           _signer = await _provider.getSigner();
-  //       }
-  //       setProvider(_provider);
-  //       setSigner(_signer);
-  //   }
-  //   init();
-  // }, []);
+  useEffect(() => {
+    async function init() {
+      let _provider, _signer;
+      if (window.ethereum == null) {
+        console.log("MetaMask not installed; using read-only defaults");
+        _provider = ethers.getDefaultProvider();
+      } else {
+        _provider = new ethers.BrowserProvider(window.ethereum);
+        _signer = await _provider.getSigner();
+      }
+      setProvider(_provider);
+      setSigner(_signer);
+    }
+    init();
+  }, []);
 
   const handleBuyClick = (nftId: number) => {
-    setCurrentNftId(nftId);
+    if (!contractAddress.trim()) {
+      alert("Необходимо задать адрес контракта");
+      return;
+    }
+
     // TODO вызывать buyToken из контракта с заданным currentNftId
     // получить через метод getMarketItems() обновленный список NFT и засетить в стейт
-    alert("TODO: покупка nft с id " + nftId + currentNftId);
-    setCurrentNftId(null);
+    const contract = new ethers.Contract(contractAddress, ABI, provider);
+    const addr = contract.getAddress();
+    console.log(addr); // иначе линт падает
+    console.log(signer); // иначе линт падает
+    alert("Покупка NFt с id " + nftId);
+    // const items = contract.getMarketItems();
+    // Error: contract.getMarketItems is not a function
   };
 
   const handleAddNftClick = () => {
@@ -85,7 +100,16 @@ const NftMarketComponent = () => {
     setNewNft(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleContractAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setContractAddress(e.target.value);
+  };
+
   const handleAddNftSubmit = async () => {
+    if (!contractAddress.trim()) {
+      alert("Необходимо задать адрес контракта");
+      return;
+    }
+
     if (!newNft.price.trim() || !newNft.nftUri.trim()) {
       alert("Пожалуйста, заполните все поля");
       return;
@@ -116,6 +140,13 @@ const NftMarketComponent = () => {
       <div className={`${showAddNftModal ? "blur-sm" : ""}`}>
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Nft Market</h1>
+          <input
+            type="text"
+            value={contractAddress}
+            onChange={handleContractAddressChange}
+            placeholder="Адрес контракта"
+            className="border border-gray-300 rounded p-2 w-64"
+          />
           <button
             onClick={handleAddNftClick}
             className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded transition"
