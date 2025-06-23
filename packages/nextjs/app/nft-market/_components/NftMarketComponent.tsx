@@ -1,61 +1,47 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
-import { ethers } from 'ethers';
 
-const ABI = [
-    "function safeMint(address to) public returns (uint256)"
-];
-
-interface ImageCard {
+interface NftCard {
   id: number;
-  title: string;
   price: number;
-  imageUrl: string;
+  nftUri: string;
 }
 
 const NftMarketComponent = () => {
-  const [images, setImages] = useState<ImageCard[]>([
+  const [nfts, setNfts] = useState<NftCard[]>([
     {
       id: 1,
-      title: "Горный пейзаж",
       price: 1500,
-      imageUrl: "https://source.unsplash.com/random/300x200/?mountain",
+      nftUri:
+        "https://media.istockphoto.com/id/1419410282/ru/%D1%84%D0%BE%D1%82%D0%BE/%D1%82%D0%B8%D1%85%D0%B8%D0%B9-%D0%BB%D0%B5%D1%81-%D0%B2%D0%B5%D1%81%D0%BD%D0%BE%D0%B9-%D1%81-%D0%BA%D1%80%D0%B0%D1%81%D0%B8%D0%B2%D1%8B%D0%BC%D0%B8-%D1%8F%D1%80%D0%BA%D0%B8%D0%BC%D0%B8-%D1%81%D0%BE%D0%BB%D0%BD%D0%B5%D1%87%D0%BD%D1%8B%D0%BC%D0%B8-%D0%BB%D1%83%D1%87%D0%B0%D0%BC%D0%B8.jpg?s=2048x2048&w=is&k=20&c=eXaxdkzHMWHRRK1QFzzhiXSZKG_SyR1k9iVK7g7f6X8=",
     },
     {
       id: 2,
-      title: "Морской закат",
       price: 2000,
-      imageUrl: "https://source.unsplash.com/random/300x200/?sunset",
+      nftUri:
+        "https://media.istockphoto.com/id/1317323736/ru/%D1%84%D0%BE%D1%82%D0%BE/%D0%B2%D0%B8%D0%B4-%D0%BD%D0%B0-%D0%BD%D0%B5%D0%B1%D0%BE-%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B4%D0%B5%D1%80%D0%B5%D0%B2%D1%8C%D0%B5%D0%B2.webp?s=2048x2048&w=is&k=20&c=3Ji6Rih43HT6XUBi0ESTJ6ihCqH123ESZUxYqUBaoWc=",
     },
     {
       id: 3,
-      title: "Лесная тропа",
       price: 1200,
-      imageUrl: "https://source.unsplash.com/random/300x200/?forest",
+      nftUri:
+        "https://media.istockphoto.com/id/1322277517/ru/%D1%84%D0%BE%D1%82%D0%BE/%D0%B4%D0%B8%D0%BA%D0%B0%D1%8F-%D1%82%D1%80%D0%B0%D0%B2%D0%B0-%D0%B2-%D0%B3%D0%BE%D1%80%D0%B0%D1%85-%D0%BD%D0%B0-%D0%B7%D0%B0%D0%BA%D0%B0%D1%82%D0%B5.webp?s=2048x2048&w=is&k=20&c=SK1eye3LU9LfhttAe_VXqOx4bTNTAYrv0Jeh0vmN0yA=",
     },
   ]);
 
-  // Состояния для покупки
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [currentImageId, setCurrentImageId] = useState<number | null>(null);
-  const [address, setAddress] = useState("");
-
-  // Состояния для добавления новой картинки
-  const [showAddImageModal, setShowAddImageModal] = useState(false);
-  const [newImage, setNewImage] = useState({
-    title: "",
+  const [currentNftId, setCurrentNftId] = useState<number | null>(null);
+  const [showAddNftModal, setShowAddNftModal] = useState(false);
+  const [newNft, setNewNft] = useState({
     price: "",
-    imageUrl: "",
+    nftUri: "",
   });
 
   // const [signer, setSigner] = useState(null);
   // const [provider, setProvider] = useState(null);
 
-  // Эффект для блокировки скролла при открытой модалке
   useEffect(() => {
-    if (showAddressModal || showAddImageModal) {
+    if (showAddNftModal) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -64,7 +50,7 @@ const NftMarketComponent = () => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [showAddressModal, showAddImageModal]);
+  }, [showAddNftModal]);
 
   // useEffect(() => {
   //   async function init() {
@@ -82,74 +68,56 @@ const NftMarketComponent = () => {
   //   init();
   // }, []);
 
-  const handleBuyClick = (imageId: number) => {
-    setCurrentImageId(imageId);
-    setShowAddressModal(true);
+  const handleBuyClick = (nftId: number) => {
+    setCurrentNftId(nftId);
+    // TODO вызывать buyToken из контракта с заданным currentNftId
+    // получить через метод getMarketItems() обновленный список NFT и засетить в стейт
+    alert("TODO: покупка nft с id " + nftId + currentNftId);
+    setCurrentNftId(null);
   };
 
-  const handlePurchaseConfirm = () => {
-    if (!address.trim()) {
-      alert("Пожалуйста, введите адрес доставки");
-      return;
-    }
-
-    console.log(`Покупка картины ID: ${currentImageId}`);
-    console.log(`Адрес доставки: ${address}`);
-
-    setShowAddressModal(false);
-    setAddress("");
-    setCurrentImageId(null);
-
-    alert("Спасибо за покупку! Ваш заказ оформлен.");
+  const handleAddNftClick = () => {
+    setShowAddNftModal(true);
   };
 
-  const handleAddImageClick = () => {
-    setShowAddImageModal(true);
-  };
-
-  const handleNewImageChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleNewNftChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setNewImage(prev => ({ ...prev, [name]: value }));
+    setNewNft(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAddImageSubmit = async () => {
-    if (!newImage.title.trim() || !newImage.price.trim() || !newImage.imageUrl.trim()) {
+  const handleAddNftSubmit = async () => {
+    if (!newNft.price.trim() || !newNft.nftUri.trim()) {
       alert("Пожалуйста, заполните все поля");
       return;
     }
 
-    const price = parseFloat(newImage.price);
+    const price = parseFloat(newNft.price);
     if (isNaN(price) || price <= 0) {
       alert("Пожалуйста, введите корректную цену");
       return;
     }
 
-    const newImageCard: ImageCard = {
-      id: Date.now(), // Используем timestamp как временный ID
-      title: newImage.title,
+    const newNftCard: NftCard = {
+      id: Date.now(),
       price: price,
-      imageUrl: newImage.imageUrl,
+      nftUri: newNft.nftUri,
     };
 
-    setImages(prev => [...prev, newImageCard]);
-    setNewImage({ title: "", price: "", imageUrl: "" });
-    setShowAddImageModal(false);
-
-    // const contractAddress = "";
-    // const contract = new ethers.Contract(contractAddress, ABI, signer);
-    // const tx = await contract.safeMint(signer.getAddress());
-    // await tx.wait();
-    alert("Картинка успешно добавлена на продажу!");
+    // TODO вызывать метод контракта createToken()
+    // TODO получить через метод getMarketItems() обновленный список NFT и засетить в стейт
+    setNfts(prev => [...prev, newNftCard]);
+    setNewNft({ price: "", nftUri: "" });
+    setShowAddNftModal(false);
   };
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
-      {/* Кнопка добавления и список карточек */}
-      <div className={`${showAddressModal || showAddImageModal ? "blur-sm" : ""}`}>
+      {/* Список карточек */}
+      <div className={`${showAddNftModal ? "blur-sm" : ""}`}>
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Галерея картин</h1>
+          <h1 className="text-3xl font-bold">Nft Market</h1>
           <button
-            onClick={handleAddImageClick}
+            onClick={handleAddNftClick}
             className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded transition"
           >
             Добавить картинку
@@ -157,21 +125,20 @@ const NftMarketComponent = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {images.map(image => (
-            <div key={image.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+          {nfts.map(nft => (
+            <div key={nft.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <img
-                src={image.imageUrl}
-                alt={image.title}
+                src={nft.nftUri}
+                alt={nft.id.toString()}
                 className="w-full h-48 object-cover"
                 onError={e => {
                   (e.target as HTMLImageElement).src = "https://via.placeholder.com/300x200?text=Image+not+found";
                 }}
               />
               <div className="p-4">
-                <h2 className="text-xl font-semibold mb-2">{image.title}</h2>
-                <p className="text-gray-600 mb-4">{image.price} руб.</p>
+                <p className="text-gray-600 mb-4">{nft.price} wei</p>
                 <button
-                  onClick={() => handleBuyClick(image.id)}
+                  onClick={() => handleBuyClick(nft.id)}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition"
                 >
                   Купить
@@ -182,92 +149,40 @@ const NftMarketComponent = () => {
         </div>
       </div>
 
-      {/* Модальное окно для ввода адреса при покупке */}
-      {showAddressModal && (
+      {/* Модальное окно для добавления нового Nft */}
+      {showAddNftModal && (
         <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
           <div
             className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"
-            onClick={() => setShowAddressModal(false)}
+            onClick={() => setShowAddNftModal(false)}
           />
           <div className="relative bg-white rounded-lg p-6 max-w-md w-full z-50">
-            <h2 className="text-xl font-bold mb-4">Оформление покупки</h2>
-            <p className="mb-4">Пожалуйста, введите ваш адрес для доставки:</p>
-
-            <textarea
-              value={address}
-              onChange={e => setAddress(e.target.value)}
-              className="w-full border border-gray-300 rounded p-2 mb-4"
-              rows={3}
-              placeholder="Введите полный адрес доставки"
-            />
-
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => {
-                  setShowAddressModal(false);
-                  setAddress("");
-                }}
-                className="px-4 py-2 border border-gray-300 rounded"
-              >
-                Отмена
-              </button>
-              <button
-                onClick={handlePurchaseConfirm}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Подтвердить
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Модальное окно для добавления новой картинки */}
-      {showAddImageModal && (
-        <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
-          <div
-            className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"
-            onClick={() => setShowAddImageModal(false)}
-          />
-          <div className="relative bg-white rounded-lg p-6 max-w-md w-full z-50">
-            <h2 className="text-xl font-bold mb-4">Добавить картинку на продажу</h2>
+            <h2 className="text-xl font-bold mb-4">Добавить Nft на продажу</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Название картинки</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={newImage.title}
-                  onChange={handleNewImageChange}
-                  className="w-full border border-gray-300 rounded p-2"
-                  placeholder="Введите название"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Цена (руб.)</label>
+                <label className="block text-sm font-medium mb-1">Цена (wei)</label>
                 <input
                   type="number"
                   name="price"
-                  value={newImage.price}
-                  onChange={handleNewImageChange}
+                  value={newNft.price}
+                  onChange={handleNewNftChange}
                   className="w-full border border-gray-300 rounded p-2"
                   placeholder="Введите цену"
-                  min="0"
-                  step="0.01"
+                  min="1"
+                  step="1"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">URL изображения</label>
+                <label className="block text-sm font-medium mb-1">URI Nft</label>
                 <textarea
-                  name="imageUrl"
-                  value={newImage.imageUrl}
-                  onChange={handleNewImageChange}
+                  name="nftUri"
+                  value={newNft.nftUri}
+                  onChange={handleNewNftChange}
                   className="w-full border border-gray-300 rounded p-2"
                   rows={2}
-                  placeholder="Введите URL картинки"
+                  placeholder="Введите URI изображения"
                 />
               </div>
             </div>
@@ -275,15 +190,15 @@ const NftMarketComponent = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => {
-                  setShowAddImageModal(false);
-                  setNewImage({ title: "", price: "", imageUrl: "" });
+                  setShowAddNftModal(false);
+                  setNewNft({ price: "", nftUri: "" });
                 }}
                 className="px-4 py-2 border border-gray-300 rounded"
               >
                 Отмена
               </button>
               <button
-                onClick={handleAddImageSubmit}
+                onClick={handleAddNftSubmit}
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
               >
                 Добавить
