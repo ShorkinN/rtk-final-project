@@ -26,8 +26,8 @@ export const menuLinks: HeaderMenuLink[] = [
     icon: <BugAntIcon className="h-4 w-4" />,
   },
   {
-    label: "Test Component",
-    href: "/test",
+    label: "Nft Market",
+    href: "/nft-market",
   },
 ];
 

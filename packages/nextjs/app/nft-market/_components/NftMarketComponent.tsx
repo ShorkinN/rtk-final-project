@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
+import { ethers } from 'ethers';
 
-// import { ethers } from 'ethers';
-
-// const ABI = [
-//     "function safeMint(address to) public returns (uint256)"
-// ];
+const ABI = [
+    "function safeMint(address to) public returns (uint256)"
+];
 
 interface ImageCard {
   id: number;
@@ -15,7 +15,7 @@ interface ImageCard {
   imageUrl: string;
 }
 
-const ImageShopComponent = () => {
+const NftMarketComponent = () => {
   const [images, setImages] = useState<ImageCard[]>([
     {
       id: 1,
@@ -296,4 +296,4 @@ const ImageShopComponent = () => {
   );
 };
 
-export default ImageShopComponent;
+export default NftMarketComponent;
